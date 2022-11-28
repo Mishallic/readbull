@@ -1,0 +1,2 @@
+-- CREATE USER root WITH PASSWORD 'root123';
+CREATE TABLE dataset(col1 INT, col2 varchar(255), col3 varchar(255), col4 varchar(255), col5 varchar(255), col6 varchar(255), col7 varchar(255), col8 varchar(255))

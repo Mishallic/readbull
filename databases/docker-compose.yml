@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+  postgres:
+    build:
+      context: ./postgresql
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgresql/docker-entrypoint-initdb.d/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data:/var/lib/postgresql-files
+    networks:
+      - nodejs_node_network
+  mysql:
+    image: mysql:8.0.17
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: main
+    networks:
+      - nodejs_node_network
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./data:/var/lib/mysql-files
+  mongodb:
+    container_name: container-mongodb
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root123
+    networks:
+      - nodejs_node_network
+    volumes:
+      - ./mongo/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./data:/data/datasets
+
+
+networks:
+  nodejs_node_network:
+    external: true
+
+
+
+# mongoimport --uri "mongodb://root:root123@mongodb:27017/dev" --collection dataset --type=csv --headerline --file=custom_1988_2020.csv
+
+#mysql -u root -p --local-infile=1 main
+#LOAD DATA LOCAL INFILE '/var/lib/mysql-files/custom_1988_2020.csv' INTO TABLE dataset FIELDS TERMINATED BY ',' ENCLOSED BY '' LINES TERMINATED BY '\n';LOAD DATA LOCAL INFILE '/var/lib/mysql-files/custom_1988_2020.csv' INTO TABLE dataset FIELDS TERMINATED BY ','  LINES TERMINATED BY '\n';
+
+#  pgloader --debug --verbose --type csv --with "fields terminated by ','" /var/lib/postgresql-files/custom_1988_2020.csv postgresql://root@0.0.0.0:5432/root?tablename=dataset
